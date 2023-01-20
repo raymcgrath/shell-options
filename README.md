@@ -9,3 +9,4 @@ uvicorn src.main:app --reload
 2.  Create an upsert for vol inserts (so that dupes can't ne inserted)
 3.  Error handling
 4.  Unit tests
+5.  Remove DB connection info
