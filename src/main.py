@@ -40,6 +40,12 @@ async def price_option(optionparams: OptionCalcInput):
     result = {"PRICE":price}
     return result
 
+@app.get("/test" , response_class=HTMLResponse)
+async def test():
+    get_vol_data_point("BRN", "20200105")
+    return 1
+    
+
 @app.get("/" , response_class=HTMLResponse)
 async def root():
     today = datetime.date.today()

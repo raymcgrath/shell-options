@@ -9,6 +9,7 @@ import math
 import numpy as np
 from statistics import NormalDist
 from schemas import * 
+from db_methods import * 
 
 class OptionBase: 
     def __init__(self, option: OptionCalcInput ):
@@ -17,10 +18,10 @@ class OptionBase:
         self.put_call = option.PUT_CALL
         self.strike = option.STRIKE_PRICE
         self.us_bus = CustomBusinessDay(calendar=USFederalHolidayCalendar())
-        self.initial_price = 19.0
-        self.risk_free_rate = 0.1
-        self.implied_volatility = 0.2798
-
+        self.initial_price = option.INITIAL_PRICE
+        self.risk_free_rate = option.RISK_FREE_RATE
+        self.tradedate = date.today()
+        self.implied_volatility = get_vol_data_point(self.underlying,self.tradedate)
 
     #region props
     @property
