@@ -1,14 +1,15 @@
 from typing import List
 from fastapi import FastAPI
 import datetime
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, validator
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from db_methods import * 
 from schemas import *
-import optionfunctions as optf
-
+from optionfunctions import * 
 app = FastAPI()
 origins = ["*"]
 
@@ -26,26 +27,27 @@ async def test():
 
 @app.post("/submitvoldata")
 async def submitvoldata(voldata: ContractVolDataList):
-    submit_vol_data(voldata)    
+    submit_vol_data_points(voldata)    
     response = "Success"
     return response
 
 @app.get("/getvoldata")
 async def getvoldata():
-    return get_vol_data()
+    response = get_vol_data()
+    return response
 
 @app.post("/priceoption")
-async def price_option(optionparams: OptionCalcInput):
-    price  = optf.price_option(optionparams)
-    result = {"PRICE":price}
-    return result
+def priceoption(optionparams: OptionCalcInput):
+    price  = price_option(optionparams)
+    result = {"PRICE":price} 
+    return JSONResponse(result)
 
 @app.get("/test" , response_class=HTMLResponse)
 async def test():
-    get_vol_data_point("BRN", "20200105")
-    return 1
+    price = get_vol_data_point("BRN", "20200105")
+    result = {"PRICE":price} 
+    return JSONResponse(result)
     
-
 @app.get("/" , response_class=HTMLResponse)
 async def root():
     today = datetime.date.today()

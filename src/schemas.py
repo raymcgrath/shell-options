@@ -9,13 +9,12 @@ class OptionCalcInput(BaseModel):
     STRIKE_PRICE: float
     PUT_CALL: str
     RISK_FREE_RATE: float
-    IMPLIED_VOLATILITY: float
        
 class OptionCalcInputList(BaseModel):
     calcdata: List[OptionCalcInput]     
 
 class ContractVolData(BaseModel):
-    contract_code: str
+    underlying: str
     datadate: datetime.date
     implied_vol: float    
 
