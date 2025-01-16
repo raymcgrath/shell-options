@@ -43,7 +43,8 @@ async def getvoldata():
 async def priceoption(optionparams: OptionCalcInput):
     #add to the last 100 price requests
     global last_100_price_requests
-    #key is the OptionCalcInput object, value is the price
+    
+    #! the hash would not be guaranteed to be unique, but for the purposes of this test it is sufficient
     opihash = hash(optionparams)
     
     if last_100_price_requests.get(opihash) is not None:
