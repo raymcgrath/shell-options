@@ -45,7 +45,7 @@ async def priceoption(optionparams: OptionCalcInput):
     global last_100_price_requests
     
     #! the hash would not be guaranteed to be unique, but for the purposes of this test it is sufficient
-    opihash = hash(optionparams)
+    opihash = optionparams
     
     if last_100_price_requests.get(opihash) is not None:
         price = last_100_price_requests[opihash]
