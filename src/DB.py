@@ -107,14 +107,17 @@ class DB:
         cur.execute(sql)
         conn.commit()
         cur.close()    
-        
+            
     async def fetch_one(self, sql):
         if self.connection.closed > 0:
-            self.connection = await self.get_connection()
-            self.connection = self.get_connection()
+            self.connection = await self.get_connection()  # Ensure this returns a fresh connection
         conn = self.connection
+        result = await asyncio.to_thread(self._execute_sql, conn, sql)
+        return result
+
+    def _execute_sql(self, conn, sql):
         cur = conn.cursor()
         cur.execute(sql)
         result = cur.fetchone()
+        cur.close()
         return result
-        cur.close()    

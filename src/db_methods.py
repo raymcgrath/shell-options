@@ -41,7 +41,7 @@ async def get_vol_data_point(contract, datadate):
     else:
         return 0.2
 
-def get_vol_data():
+async def get_vol_data():
     db = DB()
     sql = "select * from md.volatility"
     df = db.get_df_from_sql(db.connection, sql)    
