@@ -10,16 +10,32 @@ from schemas import *
 from db_methods import * 
 
 class OptionBase: 
-    def __init__(self, option: OptionCalcInput ):
-        self.underlying =  option.UNDERLYING
-        self.expiry = option.EXPIRY
-        self.put_call = option.PUT_CALL
-        self.strike = option.STRIKE_PRICE
+    def __init__(self, underlying, expiry, put_call, strike, initial_price, risk_free_rate, tradedate, implied_volatility ):
+        self.underlying = underlying
+        self.expiry = expiry
+        self.put_call = put_call
+        self.strike = strike
         self.us_bus = CustomBusinessDay(calendar=USFederalHolidayCalendar())
-        self.initial_price = option.INITIAL_PRICE
-        self.risk_free_rate = option.RISK_FREE_RATE
-        self.tradedate = date.today()
-        self.implied_volatility = get_vol_data_point(self.underlying,self.tradedate)
+        self.initial_price = initial_price
+        self.risk_free_rate = risk_free_rate
+        self.tradedate = tradedate
+        self.implied_volatility = implied_volatility
+
+
+    'async factory method, as __init__ cannot be async'
+    @classmethod
+    async def create(cls, option):
+        implied_volatility = await get_vol_data_point(option.UNDERLYING, option.EXPIRY)
+        return cls(
+            underlying=option.UNDERLYING,
+            expiry=option.EXPIRY,
+            put_call=option.PUT_CALL,
+            strike=option.STRIKE_PRICE,
+            initial_price=option.INITIAL_PRICE,
+            risk_free_rate=option.RISK_FREE_RATE,
+            tradedate=date.today(),
+            implied_volatility=implied_volatility
+        )
 
     #region props
     @property
@@ -95,7 +111,7 @@ class OptionBase:
     
     def time_in_years(self):
         #reldelta = relativedelta(self.expiry_date, date.today())
-        diff = self.expiry_date - date.today()
+        diff = self.expiry - date.today()
         yearfrac = diff.days/365.0
         return yearfrac
     #endregion datefunctions
@@ -109,16 +125,22 @@ class OptionBase:
         return d1 - v*np.sqrt(T)
             
     def calc_call_value(self): 
-        F	 = self.initial_price
-        X	 = self.strike
-        T	 = self.time_in_years()
-        r	 = self.risk_free_rate
-        v	 = self.implied_volatility
+        price = -1
+        
+        try:
+            F = self.initial_price
+            X = self.strike
+            T = self.time_in_years()
+            r = self.risk_free_rate
+            v = self.implied_volatility
 
-        d1 = self.calc_d1(F, X, T, r, v)
-        d2 = self.calc_d2(F, X, T, r, v)
-        price = np.exp(-r * T) * (F*NormalDist(mu=0, sigma=1).cdf(d1)-X*NormalDist(mu=0, sigma=1).cdf(d2))   #  NormalDist just to get past problem with scipy install
-        return 2.456 
+            d1 = self.calc_d1(F, X, T, r, v)
+            d2 = self.calc_d2(F, X, T, r, v)
+            price = np.exp(-r * T) * (F * NormalDist(mu=0, sigma=1).cdf(d1) - X * NormalDist(mu=0, sigma=1).cdf(d2))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            price = -1
+        return price
     
     def calc_put_value(self): 
         F	 = self.initial_price

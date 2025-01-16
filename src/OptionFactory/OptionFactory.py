@@ -3,13 +3,13 @@ from OptionFactory.OptionHH import OptionHH
 
 class OptionFactory:
     @staticmethod
-    def create_option_object(option):
+    async def create_option_object(option):
         underlying_code= option.UNDERLYING
         # underlying_code = option.get('underlying_code')
         if underlying_code =='BRN': 
-            return OptionBRN(option)
+            return await OptionBRN.create(option)
         elif underlying_code =='HH':            
-            return OptionHH(option)
+            return await OptionHH.create(option)
         else: 
             raise ValueError(underlying_code)
             

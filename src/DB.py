@@ -4,6 +4,7 @@ import pandas.io.sql as sqlio
 import sys
 import psycopg2.extras as extras
 import os
+import asyncio
 
 class DB:    
     def __init__(self):
@@ -107,8 +108,9 @@ class DB:
         conn.commit()
         cur.close()    
         
-    def fetch_one(self, sql):
+    async def fetch_one(self, sql):
         if self.connection.closed > 0:
+            self.connection = await self.get_connection()
             self.connection = self.get_connection()
         conn = self.connection
         cur = conn.cursor()

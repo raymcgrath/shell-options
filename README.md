@@ -1,4 +1,4 @@
-# shell-options
+.\sc    # shell-options
 
 ##TO RUN IN DEBGGER##
 uvicorn src.main:app --reload
@@ -10,3 +10,8 @@ uvicorn src.main:app --reload
 3.  Error handling
 4.  Unit tests
 5.  Remove DB connection info
+
+
+docker build -t optionpricerservice:latest .
+
+docker run -p 8003:8003 -p 8506:8506 optionpricerservice

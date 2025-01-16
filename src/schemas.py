@@ -2,13 +2,15 @@ from typing import List, Union
 from pydantic import BaseModel
 import datetime 
 
-class OptionCalcInput(BaseModel):
+
+class OptionCalcInput(BaseModel, frozen=True):
     UNDERLYING: str
-    EXPIRY: str
+    EXPIRY: datetime.date
     INITIAL_PRICE: float
     STRIKE_PRICE: float
     PUT_CALL: str
     RISK_FREE_RATE: float
+
        
 class OptionCalcInputList(BaseModel):
     calcdata: List[OptionCalcInput]     

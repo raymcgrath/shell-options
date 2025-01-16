@@ -3,6 +3,7 @@ import pandas as pd
 from schemas import *
 import json
 from sqlalchemy import create_engine
+import asyncio
 
 def submit_vol_data(voldata: ContractVolData ):
     try:
@@ -28,13 +29,17 @@ def submit_vol_data_points(voldata: ContractVolData):
     except:
         return False
 
-def get_vol_data_point(contract, datadate):
+async def get_vol_data_point(contract, datadate):
     db = DB()
     sql = "select implied_vol from md.volatility where underlying='{}' and datadate ='{}' "
     sql = sql.format(contract, datadate)
-    result = db.fetch_one(sql)
-    result = float(result[0])
-    return result
+    result = await db.fetch_one(sql)
+    asyncio.sleep(10)
+    #check if result is None
+    if result is not None:
+        return float(result[0])
+    else:
+        return 0.2
 
 def get_vol_data():
     db = DB()

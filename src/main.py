@@ -21,6 +21,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+last_100_price_requests = {}
+
 @app.get("/today")
 async def test():
     return datetime.date.today()
@@ -34,11 +37,20 @@ async def submitvoldata(voldata: ContractVolDataList):
 @app.get("/getvoldata")
 async def getvoldata():
     response = get_vol_data()
-    return response
+    return JSONResponse(response)
 
 @app.post("/priceoption")
-def priceoption(optionparams: OptionCalcInput):
-    price  = price_option(optionparams)
+async def priceoption(optionparams: OptionCalcInput):
+    #add to the last 100 price requests
+    global last_100_price_requests
+    #key is the OptionCalcInput object, value is the price
+    opihash = hash(optionparams)
+    
+    if last_100_price_requests.get(opihash) is not None:
+        price = last_100_price_requests[opihash]
+    else: 
+        price  = await price_option(optionparams)
+        last_100_price_requests[opihash] = price
     result = {"PRICE":price} 
     return JSONResponse(result)
 
@@ -112,5 +124,5 @@ async def root():
 
 #region for debug
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8003)
 #endregion
