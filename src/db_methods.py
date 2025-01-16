@@ -1,3 +1,4 @@
+
 from DB import DB
 import pandas as pd
 from schemas import *
@@ -34,7 +35,6 @@ async def get_vol_data_point(contract, datadate):
     sql = "select implied_vol from md.volatility where underlying='{}' and datadate ='{}' "
     sql = sql.format(contract, datadate)
     result = await db.fetch_one(sql)
-    asyncio.sleep(10)
     #check if result is None
     if result is not None:
         return float(result[0])
